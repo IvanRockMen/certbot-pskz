@@ -14,5 +14,8 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: install setuptools
+        run: python -m pip install setuptools
+
       - name: run tests
         run: python setup.py test
