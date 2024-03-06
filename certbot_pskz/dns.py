@@ -45,7 +45,7 @@ class Authenticator(dns_common.DNSAuthenticator):
 
     def more_info(self) -> str:
         return "This plugin configures a DNS TXT record to respond to a dns-01 challenge using" +\
-        "the Ps.kz API."
+            "the Ps.kz API."
 
     def _setup_credentials(self) -> None:
         self.credentials = self._configure_credentials(
@@ -86,7 +86,7 @@ class _PsKzClient:
     """
 
     def __init__(self, email, password):
-        self.http = _HttpClient()
+        self.http = requests.Session()
         self.options = {
             "email": email,
             "password": password,
@@ -96,27 +96,11 @@ class _PsKzClient:
             "input_format": "json",
         }
 
+    def _authenticate(self):
+        response = self.http.post()
+
     def add_txt_record(self, record_name, record_content):
         pass
 
     def del_txt_record(self, record_name, record_content):
         pass
-
-
-class _HttpClient:
-    """
-    Encapsulates HTTP requests
-    """
-
-    def send(self, url, data):
-        """
-        Sends a POST request.
-        :param str url: URL for the new :class:`Request` object.
-        :param dict data: Dictionary(will be form-encoded) to send in the body of the :class:`Request`.
-        :raises requests.exceptions.RequestException: if an error occurs communicating with HTTP server
-        """
-
-        response = requests.post(url, data=data)
-        response.raise_for_status()
-
-        return response.json()

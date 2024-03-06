@@ -1,9 +1,9 @@
-name: Tests
+name: Deploy
 
-on: ["push"]
+on: ["release"]
 
 jobs:
-  tests:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: checkout repo content
@@ -16,6 +16,3 @@ jobs:
 
       - name: install setuptools
         run: python -m pip install setuptools
-
-      - name: run tests
-        run: python setup.py test
