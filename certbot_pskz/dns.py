@@ -203,8 +203,27 @@ class _PsKzClient:
 
     def del_txt_record(self, record_name, record_content):
 
-        get_dns_query = {
-            
+        get_dns_query = """
+            query Query($domainName) {
+                dns {
+                    zone(name: $domainName) {
+                        id
+                        name
+                        records {
+                            id
+                            name
+                            type
+                            value
+                            ttl
+                        }
+                    }
+                }
+            }
+        """
+
+        self._authenticate()
+        variables = {
+            "domainName": self.domain
         }
 
         graphql_query = """
