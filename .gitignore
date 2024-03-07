@@ -86,3 +86,4 @@ env/
 
 # Project settings
 .idea
+.vscode/

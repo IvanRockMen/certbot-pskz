@@ -1,7 +1,7 @@
 """DNS Authenticator for Ps.kz DNS."""
 import logging
 
-# import json
+import uuid
 import requests
 
 import zope.interface
@@ -63,7 +63,7 @@ class Authenticator(dns_common.DNSAuthenticator):
         validation_name: str,
         validation: str
     ) -> None:
-        self._get_pskz_client().add_txt_record(validation_name, validation)
+        self._get_pskz_client(domain).add_txt_record(validation_name, validation)
 
     def _cleanup(
         self,
@@ -71,21 +71,26 @@ class Authenticator(dns_common.DNSAuthenticator):
         validation_name: str,
         validation: str
     ) -> None:
-        self._get_pskz_client().del_txt_record(validation_name, validation)
+        self._get_pskz_client(domain).del_txt_record(validation_name, validation)
 
-    def _get_pskz_client(self) -> "_PsKzClient":
-        return _PsKzClient(
+    def _get_pskz_client(self, domain) -> "_PsKzClient":
+        client = _PsKzClient(
             self.credentials.conf("email"),
             self.credentials.conf("password")
         )
+        client.setup_domain(domain)
+        return client
 
 
 class _PsKzClient:
     """
     Encapsulates all communication with the Ps.kz
     """
+    _AUTH_URL = "https://auth.ps.kz/graphql?lang=ru&opname=LoginMutation"
+    _MUTATION_RECORD_URL = "https://console.ps.kz/dns/graphql"
+    _CHALLENGE_URL = "https://auth.ps.kz/oidc/login"
 
-    def __init__(self, email, password):
+    def __init__(self, domain, email, password):
         self.http = requests.Session()
         self.options = {
             "email": email,
@@ -96,11 +101,123 @@ class _PsKzClient:
             "input_format": "json",
         }
 
+    def setup_domain(self, domain):
+        self.domain = domain
+
     def _authenticate(self):
-        response = self.http.post()
+        data = {
+            "operationName": "LoginMutation",
+            "variables": {
+                "email": self.options.get("email", ""),
+                "password": self.options.get("password", ""),
+                "remember": True,
+            },
+            "query": """
+                mutation LoginMutation($email: String!, $token: String, $password: String!, $remember: Boolean) {
+                    auth {
+                        guestLogin(
+                            email: $email
+                            token: $token
+                            password: $password
+                            remember: $remember
+                        ) {
+                            totp
+                            emailVerified
+                            user {
+                                phoneVerified
+                                __typename
+                            }
+                            error {
+                                name
+                                message
+                                ... on UserDeactivatedError {
+                                    deactivationReason
+                                    __typename
+                                }
+                                __typename
+                            }
+                            __typename
+                        }
+                        __typename
+                    }
+                    __typename
+                }
+
+            """
+        }
+        response = self.http.post(self._AUTH_URL, json=data)
+        resp_data = response.json()
+        error_data = resp_data['data']['auth']['guestLogin'].get("error")
+        if error_data:
+            error_name = error_data['name']
+            error_message = error_data['message']
+            raise requests.exceptions.HTTPError(f"{error_name}: {error_message}")
+        login_challenge_params = {"login_challenge": f"{uuid.uuid4().hex}"}
+        resp = self.http.get(self._CHALLENGE_URL, params=login_challenge_params)
+        if resp != 200:
+            raise requests.exceptions.HTTPError(f"Login challenge was ended with error: {resp.status_code}. Reason: {resp.text}")
+
 
     def add_txt_record(self, record_name, record_content):
-        pass
+        graphql_query = """
+            mutation CreateDNSRecord($zoneName: string!, $recordData: RecordCreateInput!) {
+                dns {
+                    record {
+                        create(
+                            zoneName: $zoneName,
+                            createData: $recordData
+                        ) {
+                            name
+                            records {
+                                name
+                                type
+                                value
+                                ttl
+                            }
+                        }
+                    }
+                }
+            }
+        """
+
+        variables = {
+            "zoneName": self.domain,
+            "recordData": {
+                "name": record_name,
+                "type": "TXT",
+                "value": record_content,
+                "ttl": 600,
+            }
+        }
+
+        self._authenticate()
+
+        response = self.http.post(
+            self._MUTATION_RECORD_URL,
+            json={"query": graphql_query, "variables": variables},
+        )
+        if response.status_code != 200:
+            raise Exception(
+                f"Failed to add records in ps.kz. Status code: {response.status_code}, Reason: {response.text}"
+            )
 
     def del_txt_record(self, record_name, record_content):
-        pass
+
+        get_dns_query = {
+            
+        }
+
+        graphql_query = """
+            mutation DeleteDnsRecord($zoneName: string!, $recordId: string!) {
+                dns {
+                    record {
+                        delete(
+                            zoneName: $zoneName,
+                            recordId: $recordId
+                        ) {
+
+                        }
+                    }
+                }
+            }
+        """
