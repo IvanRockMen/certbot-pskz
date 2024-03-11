@@ -201,6 +201,13 @@ class _PsKzClient:
                 f"Failed to add records in ps.kz. Status code: {response.status_code}, Reason: {response.text}"
             )
 
+        resp_data = response.json()
+        error_data = resp_data.get("error")
+
+        if error_data:
+            error = error_data["errors"][0]["message"]
+            raise requests.exceptions.HTTPError(f"Error: {error}")
+
     def del_txt_record(self, record_name, record_content):
 
         get_dns_query = """
@@ -226,6 +233,26 @@ class _PsKzClient:
             "domainName": self.domain
         }
 
+        response = self.http.post(
+            self._MUTATION_RECORD_URL,
+            json={"query": get_dns_query, "variables": variables}
+        )
+
+        if response.status_code != 200:
+            raise Exception(f"Error for get_dns_records with status: {response.status_code}. Reason: f{response.text}")
+
+        result = response.json()
+        error_data = result.get("error")
+        if error_data:
+            error = error_data["errors"][0]["message"]
+            raise requests.exceptions.HTTPError(f"Error: {error}")
+
+        records = result["data"]["dns"]["zone"]["records"]
+
+        record_id = ""
+        for record in records:
+            if record["type"] == "TXT" and record["value"] == record_content:
+                record_id = record["id"]
         graphql_query = """
             mutation DeleteDnsRecord($zoneName: string!, $recordId: string!) {
                 dns {
@@ -240,3 +267,25 @@ class _PsKzClient:
                 }
             }
         """
+
+        variables = {
+            "zoneName": self.domain,
+            "recordId": record_id,
+        }
+
+        response = self.http.post(
+            self._MUTATION_RECORD_URL,
+            json={"query": graphql_query, "variables": variables},
+        )
+
+        if response.status_code != 200:
+            raise Exception(f"Error deleting record. Statys {response.status_code}. Reason: {response.text}")
+
+        result = response.json()
+
+        error_data = result.get("error")
+        if error_data:
+            error = error_data["errors"][0]["message"]
+            raise requests.exceptions.HTTPError(f"Error: {error}")
+
+        
