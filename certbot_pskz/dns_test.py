@@ -16,6 +16,8 @@ PASSWORD = "bar"
 
 HTTP_ERROR = requests.exceptions.RequestException
 
+patch_display_util = test_util.patch_display_util
+
 
 class AuthenticatorTest(
     test_util.TempDirTestCase,
@@ -25,7 +27,7 @@ class AuthenticatorTest(
     def setUp(self):
         from certbot_pskz.dns import Authenticator
 
-        super(AuthenticatorTest, self).setUp()
+        super().setUp()
 
         path = os.path.join(self.tempdir, "file.ini")
         dns_test_common.write({
@@ -33,6 +35,7 @@ class AuthenticatorTest(
             "pskz_password": PASSWORD,
         }, path)
 
+        super().setUp()
         self.config = mock.MagicMock(
             pskz_credentials=path,
             pskz_propagation_seconds=0
@@ -46,18 +49,12 @@ class AuthenticatorTest(
             return_value=self.mock_client
         )
 
-    def test_perform(self):
+    @patch_display_util()
+    def test_perform(self, unused_mock_get_utility):
         self.auth.perform([self.achall])
 
-        expected = [
-            mock.call.add_txt_record(
-                '_acme-challenge.' + DOMAIN,
-                mock.ANY
-            )
-        ]
-        self.assertEqual(
-            expected,
-            self.mock_client.mock_calls
+        self.mock_client.add_txt_record.assert_called_with(
+            DOMAIN, "_acme-challenge." + DOMAIN + ".", mock.ANY
         )
 
     def test_cleanup(self):
@@ -75,4 +72,4 @@ class AuthenticatorTest(
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main()  # pragma: no cover
