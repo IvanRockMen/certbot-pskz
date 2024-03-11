@@ -1,5 +1,5 @@
 import os
-# import unittest
+import unittest
 
 # import json
 import mock
@@ -51,11 +51,14 @@ class AuthenticatorTest(
 
         expected = [
             mock.call.add_txt_record(
-                "_acme-challenge." + DOMAIN,
+                '_acme-challenge.' + DOMAIN,
                 mock.ANY
             )
         ]
-        self.assertEqual(expected, self.mock_client.mock_calls)
+        self.assertEqual(
+            expected,
+            self.mock_client.mock_calls
+        )
 
     def test_cleanup(self):
         # _attempt_cleanup | pylint: disable=protected-access
@@ -69,3 +72,7 @@ class AuthenticatorTest(
             )
         ]
         self.assertEqual(expected, self.mock_client.mock_calls)
+
+
+if __name__ == "__main__":
+    unittest.main()

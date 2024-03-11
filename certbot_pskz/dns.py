@@ -22,7 +22,7 @@ class Authenticator(dns_common.DNSAuthenticator):
 
     """
 
-    description = "Obtain certificates using a DNS TXT record (if you are using Ps.kz for DNS)"
+    description = "Obtain certificates using a DNS TXT record (if you are using Ps.kz for DNS)"  # noqa: E501
 
     def __init__(self, *args, **kwargs):
         super(Authenticator, self).__init__(*args, **kwargs)
@@ -45,7 +45,7 @@ class Authenticator(dns_common.DNSAuthenticator):
 
     def more_info(self) -> str:
         return "This plugin configures a DNS TXT record to respond to a dns-01 challenge using" +\
-            "the Ps.kz API."
+            "the Ps.kz API."  # noqa: E501
 
     def _setup_credentials(self) -> None:
         self.credentials = self._configure_credentials(
@@ -63,7 +63,10 @@ class Authenticator(dns_common.DNSAuthenticator):
         validation_name: str,
         validation: str
     ) -> None:
-        self._get_pskz_client(domain).add_txt_record(validation_name, validation)
+        self._get_pskz_client(domain).add_txt_record(
+            validation_name,
+            validation
+        )
 
     def _cleanup(
         self,
@@ -71,7 +74,10 @@ class Authenticator(dns_common.DNSAuthenticator):
         validation_name: str,
         validation: str
     ) -> None:
-        self._get_pskz_client(domain).del_txt_record(validation_name, validation)
+        self._get_pskz_client(domain).del_txt_record(
+            validation_name,
+            validation
+        )
 
     def _get_pskz_client(self, domain) -> "_PsKzClient":
         client = _PsKzClient(
@@ -143,7 +149,7 @@ class _PsKzClient:
                     __typename
                 }
 
-            """
+            """  # noqa: E501
         }
         response = self.http.post(self._AUTH_URL, json=data)
         resp_data = response.json()
@@ -151,12 +157,16 @@ class _PsKzClient:
         if error_data:
             error_name = error_data['name']
             error_message = error_data['message']
-            raise requests.exceptions.HTTPError(f"{error_name}: {error_message}")
+            raise requests.exceptions.HTTPError(f"{error_name}: {error_message}")  # noqa: E501
         login_challenge_params = {"login_challenge": f"{uuid.uuid4().hex}"}
-        resp = self.http.get(self._CHALLENGE_URL, params=login_challenge_params)
+        resp = self.http.get(
+            self._CHALLENGE_URL,
+            params=login_challenge_params
+        )
         if resp != 200:
-            raise requests.exceptions.HTTPError(f"Login challenge was ended with error: {resp.status_code}. Reason: {resp.text}")
-
+            raise requests.exceptions.HTTPError(
+                f"Login challenge was ended with error: {resp.status_code}. Reason: {resp.text}"  # noqa: E501
+            )
 
     def add_txt_record(self, record_name, record_content):
         graphql_query = """
@@ -178,7 +188,7 @@ class _PsKzClient:
                     }
                 }
             }
-        """
+        """  # noqa: E501
 
         variables = {
             "zoneName": self.domain,
@@ -198,7 +208,7 @@ class _PsKzClient:
         )
         if response.status_code != 200:
             raise Exception(
-                f"Failed to add records in ps.kz. Status code: {response.status_code}, Reason: {response.text}"
+                f"Failed to add records in ps.kz. Status code: {response.status_code}, Reason: {response.text}"  # noqa: E501
             )
 
         resp_data = response.json()
@@ -239,7 +249,7 @@ class _PsKzClient:
         )
 
         if response.status_code != 200:
-            raise Exception(f"Error for get_dns_records with status: {response.status_code}. Reason: f{response.text}")
+            raise Exception(f"Error for get_dns_records with status: {response.status_code}. Reason: f{response.text}")  # noqa: E501
 
         result = response.json()
         error_data = result.get("error")
@@ -279,7 +289,7 @@ class _PsKzClient:
         )
 
         if response.status_code != 200:
-            raise Exception(f"Error deleting record. Statys {response.status_code}. Reason: {response.text}")
+            raise Exception(f"Error deleting record. Status {response.status_code}. Reason: {response.text}")  # noqa: E501
 
         result = response.json()
 
@@ -287,5 +297,3 @@ class _PsKzClient:
         if error_data:
             error = error_data["errors"][0]["message"]
             raise requests.exceptions.HTTPError(f"Error: {error}")
-
-        
