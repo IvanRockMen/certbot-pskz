@@ -16,3 +16,6 @@ jobs:
 
       - name: install setuptools
         run: python -m pip install setuptools
+
+      - name: build binary
+        run: python setup.py 
