@@ -28,7 +28,7 @@ setup(
     author="Ivan Bartenev",
     author_email="bartenev.ivan.a@gmail.com",
     license="MIT",
-    python_requires='>=3.10',
+    python_requires='>=3.8',
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Environment :: Plugins",
