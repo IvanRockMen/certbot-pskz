@@ -26,7 +26,7 @@ class Authenticator(dns_common.DNSAuthenticator):
         "TXT record (if you are using Ps.kz for DNS)"
 
     def __init__(self, *args, **kwargs):
-        super(Authenticator, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.credentials = None
 
     @classmethod
@@ -266,7 +266,11 @@ class _PsKzClient:
         )
 
         if response.status_code != 200:
-            raise Exception(f"Error for get_dns_records with status: {response.status_code}. Reason: f{response.text}")  # noqa: E501
+            raise Exception(
+                "Error for get_dns_records with status:" +
+                f" {response.status_code}." +
+                " Reason: f{response.text}"
+            )
 
         result = response.json()
         error_data = result.get("error")
@@ -306,7 +310,11 @@ class _PsKzClient:
         )
 
         if response.status_code != 200:
-            raise Exception(f"Error deleting record. Status {response.status_code}. Reason: {response.text}")  # noqa: E501
+            raise Exception(
+                "Error deleting record." +
+                " Status {response.status_code}." +
+                " Reason: {response.text}"
+            )
 
         result = response.json()
 

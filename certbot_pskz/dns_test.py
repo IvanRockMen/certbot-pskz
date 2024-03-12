@@ -25,6 +25,9 @@ class AuthenticatorTest(
 ):
 
     def setUp(self):
+        """
+        Setup for testcase with test Authenticator
+        """
         from certbot_pskz.dns import Authenticator
 
         super().setUp()
@@ -51,6 +54,9 @@ class AuthenticatorTest(
 
     @patch_display_util()
     def test_perform(self, unused_mock_get_utility):
+        """
+        Test perform function
+        """
         self.auth.perform([self.achall])
 
         self.mock_client.add_txt_record.assert_called_with(
@@ -59,6 +65,9 @@ class AuthenticatorTest(
 
     @patch_display_util()
     def test_cleanup(self, unused_mock_get_utility):
+        """
+        Test delete usecase
+        """
         # _attempt_cleanup | pylint: disable=protected-access
         self.auth.perform([self.achall])
         self.auth._attempt_cleanup = True
