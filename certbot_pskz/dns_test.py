@@ -11,10 +11,10 @@ from certbot.plugins import dns_test_common
 from certbot.plugins.dns_test_common import DOMAIN
 from certbot.tests import util as test_util
 
+from certbot_pskz.dns import Authenticator
+
 EMAIL = "foo"
 PASSWORD = "bar"
-
-HTTP_ERROR = requests.exceptions.RequestException
 
 patch_display_util = test_util.patch_display_util
 
@@ -24,12 +24,13 @@ class AuthenticatorTest(
     dns_test_common.BaseAuthenticatorTest
 ):
 
+    """
+    Test for Authenticator class
+    """
     def setUp(self):
         """
         Setup for testcase with test Authenticator
         """
-        from certbot_pskz.dns import Authenticator
-
         super().setUp()
 
         path = os.path.join(self.tempdir, "file.ini")
