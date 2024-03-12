@@ -248,7 +248,7 @@ class _PsKzClient:
             json={"query": graphql_query, "variables": variables},
         )
         if response.status_code != 200:
-            raise Exception(
+            raise requests.exceptions.HTTPError(
                 "Failed to add records in ps.kz." +
                 f" Status code: {response.status_code}," +
                 f" Reason: {response.text}"
@@ -261,7 +261,7 @@ class _PsKzClient:
             error = error_data["errors"][0]["message"]
             raise requests.exceptions.HTTPError(f"Error: {error}")
 
-    def del_txt_record(self, record_name, record_content):
+    def del_txt_record(self, _, record_content):
         """
         Delete txt record on ps.kz DNS provider
         """
@@ -294,7 +294,7 @@ class _PsKzClient:
         )
 
         if response.status_code != 200:
-            raise Exception(
+            raise requests.exceptions.HTTPError(
                 "Error for get_dns_records with status:" +
                 f" {response.status_code}." +
                 " Reason: f{response.text}"
@@ -338,7 +338,7 @@ class _PsKzClient:
         )
 
         if response.status_code != 200:
-            raise Exception(
+            raise requests.exceptions.HTTPError(
                 "Error deleting record." +
                 " Status {response.status_code}." +
                 " Reason: {response.text}"
