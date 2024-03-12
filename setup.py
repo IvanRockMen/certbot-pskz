@@ -44,7 +44,7 @@ setup(
         "Topic :: Security",
         "Topic :: System :: Installation/Setup",
         "Topic :: System :: Networking",
-        "Topic :: System :: System Administration",
+        "Topic :: System :: Systems Administration",
         "Topic :: Utilities",
     ],
     install_requires=install_requires,
