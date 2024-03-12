@@ -21,7 +21,7 @@ with open('README.md') as f:
     long_description = f.read()
 
 setup(
-    name="certbot-pskz1",
+    name="certbot-pskz",
     version=__version__,
     description="Ps.kz DNS authenticator plugin for Certbot",
     long_description=long_description,
