@@ -22,7 +22,8 @@ class Authenticator(dns_common.DNSAuthenticator):
 
     """
 
-    description = "Obtain certificates using a DNS TXT record (if you are using Ps.kz for DNS)"  # noqa: E501
+    description = "Obtain certificates using a DNS" +\
+        "TXT record (if you are using Ps.kz for DNS)"
 
     def __init__(self, *args, **kwargs):
         super(Authenticator, self).__init__(*args, **kwargs)
@@ -48,8 +49,9 @@ class Authenticator(dns_common.DNSAuthenticator):
         )
 
     def more_info(self) -> str:
-        return "This plugin configures a DNS TXT record to respond to a dns-01 challenge using" +\
-            "the Ps.kz API."  # noqa: E501
+        return "This plugin configures a DNS TXT" +\
+            " record to respond to a dns-01 challenge using" +\
+            "the Ps.kz API."
 
     def _setup_credentials(self) -> None:
         self.credentials = self._configure_credentials(
@@ -100,8 +102,9 @@ class _PsKzClient:
     _MUTATION_RECORD_URL = "https://console.ps.kz/dns/graphql"
     _CHALLENGE_URL = "https://auth.ps.kz/oidc/login"
 
-    def __init__(self, domain, email, password):
+    def __init__(self, email, password):
         self.http = requests.Session()
+        self.domain = ""
         self.options = {
             "email": email,
             "password": password,
@@ -123,7 +126,12 @@ class _PsKzClient:
                 "remember": True,
             },
             "query": """
-                mutation LoginMutation($email: String!, $token: String, $password: String!, $remember: Boolean) {
+                mutation LoginMutation(
+                    $email: String!,
+                    $token: String,
+                    $password: String!,
+                    $remember: Boolean
+                ) {
                     auth {
                         guestLogin(
                             email: $email
@@ -174,7 +182,10 @@ class _PsKzClient:
 
     def add_txt_record(self, record_name, record_content):
         graphql_query = """
-            mutation CreateDNSRecord($zoneName: string!, $recordData: RecordCreateInput!) {
+            mutation CreateDNSRecord(
+                $zoneName: string!,
+                $recordData: RecordCreateInput!
+            ) {
                 dns {
                     record {
                         create(
@@ -212,7 +223,9 @@ class _PsKzClient:
         )
         if response.status_code != 200:
             raise Exception(
-                f"Failed to add records in ps.kz. Status code: {response.status_code}, Reason: {response.text}"  # noqa: E501
+                "Failed to add records in ps.kz." +
+                f" Status code: {response.status_code}," +
+                f" Reason: {response.text}"
             )
 
         resp_data = response.json()
