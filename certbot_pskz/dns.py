@@ -29,7 +29,11 @@ class Authenticator(dns_common.DNSAuthenticator):
         self.credentials = None
 
     @classmethod
-    def add_parser_arguments(cls, add) -> None:
+    def add_parser_arguments(
+        cls,
+        add,
+        default_propagation_seconds=120
+    ) -> None:
         super(
             Authenticator,
             cls

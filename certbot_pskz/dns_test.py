@@ -54,21 +54,19 @@ class AuthenticatorTest(
         self.auth.perform([self.achall])
 
         self.mock_client.add_txt_record.assert_called_with(
-            DOMAIN, "_acme-challenge." + DOMAIN + ".", mock.ANY
+            "_acme-challenge." + DOMAIN, mock.ANY
         )
 
-    def test_cleanup(self):
+    @patch_display_util()
+    def test_cleanup(self, unused_mock_get_utility):
         # _attempt_cleanup | pylint: disable=protected-access
+        self.auth.perform([self.achall])
         self.auth._attempt_cleanup = True
         self.auth.cleanup([self.achall])
 
-        expected = [
-            mock.call.del_txt_record(
-                "_acme-challenge." + DOMAIN,
-                mock.ANY
-            )
-        ]
-        self.assertEqual(expected, self.mock_client.mock_calls)
+        self.mock_client.del_txt_record.assert_called_with(
+            "_acme-challenge." + DOMAIN, mock.ANY
+        )
 
 
 if __name__ == "__main__":
