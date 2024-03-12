@@ -69,6 +69,9 @@ class Authenticator(dns_common.DNSAuthenticator):
         validation_name: str,
         validation: str
     ) -> None:
+        """
+        Override _perform method for work with ps.kz
+        """
         self._get_pskz_client(domain).add_txt_record(
             validation_name,
             validation
@@ -80,6 +83,9 @@ class Authenticator(dns_common.DNSAuthenticator):
         validation_name: str,
         validation: str
     ) -> None:
+        """
+        Override _cleanup method for work with ps.kz
+        """
         self._get_pskz_client(domain).del_txt_record(
             validation_name,
             validation
@@ -90,7 +96,7 @@ class Authenticator(dns_common.DNSAuthenticator):
             self.credentials.conf("email"),
             self.credentials.conf("password")
         )
-        client.setup_domain(domain)
+        client.domain = domain
         return client
 
 
@@ -103,8 +109,11 @@ class _PsKzClient:
     _CHALLENGE_URL = "https://auth.ps.kz/oidc/login"
 
     def __init__(self, email, password):
+        """
+        Init ps.kz web client
+        """
         self.http = requests.Session()
-        self.domain = ""
+        self._domain = ""
         self.options = {
             "email": email,
             "password": password,
@@ -114,10 +123,24 @@ class _PsKzClient:
             "input_format": "json",
         }
 
-    def setup_domain(self, domain):
-        self.domain = domain
+    @property
+    def domain(self):
+        """
+        Getter for domain property
+        """
+        return self._domain
+
+    @domain.setter
+    def set_domain(self, domain):
+        """
+        Setter for domain property
+        """
+        self._domain = domain
 
     def _authenticate(self):
+        """
+        Internal method for authenticate on ps.kz
+        """
         data = {
             "operationName": "LoginMutation",
             "variables": {
@@ -181,6 +204,9 @@ class _PsKzClient:
             )
 
     def add_txt_record(self, record_name, record_content):
+        """
+        Add txt record on ps.kz DNS provider
+        """
         graphql_query = """
             mutation CreateDNSRecord(
                 $zoneName: string!,
@@ -236,7 +262,9 @@ class _PsKzClient:
             raise requests.exceptions.HTTPError(f"Error: {error}")
 
     def del_txt_record(self, record_name, record_content):
-
+        """
+        Delete txt record on ps.kz DNS provider
+        """
         get_dns_query = """
             query Query($domainName) {
                 dns {

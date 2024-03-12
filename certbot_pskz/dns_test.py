@@ -1,11 +1,11 @@
+"""
+Authenticator tests
+"""
+
 import os
 import unittest
 
-# import json
 import mock
-import requests
-
-# from certbot import errors
 
 from certbot.plugins import dns_test_common
 from certbot.plugins.dns_test_common import DOMAIN

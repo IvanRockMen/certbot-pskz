@@ -10,6 +10,7 @@ install_requires = [
     'mock',
     'setuptools',
     'zope.interface',
+    'build',
 ]
 
 data_files = [
