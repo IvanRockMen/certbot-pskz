@@ -21,7 +21,7 @@ with open('README.md') as f:
     long_description = f.read()
 
 setup(
-    name="certbot-pskz",
+    name="certbot-pskz1",
     version=__version__,
     description="Ps.kz DNS authenticator plugin for Certbot",
     long_description=long_description,
@@ -37,6 +37,8 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: POSIX :: Linux",
         "Programming Language :: Python",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
@@ -53,7 +55,7 @@ setup(
     include_package_data=True,
     entry_points={
         "certbot.plugins": [
-            "dns = certbot_pskz.dns:Authenticator",
+            "pskz_dns = certbot_pskz.dns:Authenticator",
         ],
     },
     test_suite="certbot_pskz"
