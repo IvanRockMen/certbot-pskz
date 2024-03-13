@@ -198,7 +198,7 @@ class _PsKzClient:
             self._CHALLENGE_URL,
             params=login_challenge_params
         )
-        if resp != 200:
+        if resp.status_code != 200:
             raise requests.exceptions.HTTPError(
                 f"Login challenge was ended with error: {resp.status_code}. Reason: {resp.text}"  # noqa: E501
             )
