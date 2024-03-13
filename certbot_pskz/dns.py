@@ -340,8 +340,8 @@ class _PsKzClient:
         if response.status_code != 200:
             raise requests.exceptions.HTTPError(
                 "Error deleting record." +
-                " Status {response.status_code}." +
-                " Reason: {response.text}"
+                f" Status {response.status_code}." +
+                f" Reason: {response.text}"
             )
 
         result = response.json()
