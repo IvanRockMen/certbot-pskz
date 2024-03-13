@@ -135,7 +135,7 @@ class _PsKzClient:
         """
         Setter for domain property
         """
-        self._domain = _domain
+        self._domain = _domain + "."
 
     def _authenticate(self):
         """
