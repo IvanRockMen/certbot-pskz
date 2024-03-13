@@ -297,7 +297,7 @@ class _PsKzClient:
             raise requests.exceptions.HTTPError(
                 "Error for get_dns_records with status:" +
                 f" {response.status_code}." +
-                " Reason: f{response.text}"
+                f" Reason: {response.text}"
             )
 
         result = response.json()
