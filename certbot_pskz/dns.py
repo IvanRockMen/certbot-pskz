@@ -135,7 +135,7 @@ class _PsKzClient:
         """
         Setter for domain property
         """
-        self._domain = _domain + "."
+        self._domain = _domain
 
     def _authenticate(self):
         """
@@ -234,7 +234,7 @@ class _PsKzClient:
         variables = {
             "zoneName": self.domain,
             "recordData": {
-                "name": record_name,
+                "name": record_name + ".",
                 "type": "TXT",
                 "value": record_content,
                 "ttl": 600,
