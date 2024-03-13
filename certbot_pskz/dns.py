@@ -266,7 +266,7 @@ class _PsKzClient:
         Delete txt record on ps.kz DNS provider
         """
         get_dns_query = """
-            query Query($domainName) {
+            query Query($domainName: String!) {
                 dns {
                     zone(name: $domainName) {
                         id
