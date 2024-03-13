@@ -131,11 +131,11 @@ class _PsKzClient:
         return self._domain
 
     @domain.setter
-    def domain(self, domain):
+    def domain(self, _domain):
         """
         Setter for domain property
         """
-        self._domain = domain
+        self._domain = _domain
 
     def _authenticate(self):
         """
