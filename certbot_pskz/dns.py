@@ -320,7 +320,8 @@ class _PsKzClient:
                             zoneName: $zoneName,
                             recordId: $recordId
                         ) {
-
+                            id
+                            name
                         }
                     }
                 }
