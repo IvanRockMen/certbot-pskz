@@ -209,7 +209,7 @@ class _PsKzClient:
         """
         graphql_query = """
             mutation CreateDNSRecord(
-                $zoneName: string!,
+                $zoneName: String!,
                 $recordData: RecordCreateInput!
             ) {
                 dns {
@@ -313,7 +313,7 @@ class _PsKzClient:
             if record["type"] == "TXT" and record["value"] == record_content:
                 record_id = record["id"]
         graphql_query = """
-            mutation DeleteDnsRecord($zoneName: string!, $recordId: string!) {
+            mutation DeleteDnsRecord($zoneName: String!, $recordId: String!) {
                 dns {
                     record {
                         delete(
