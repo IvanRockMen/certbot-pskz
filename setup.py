@@ -28,6 +28,7 @@ setup(
     url="https://github.com/IvanRockMen/cerbot-pskz/",
     author="Ivan Bartenev",
     author_email="bartenev.ivan.a@gmail.com",
+    long_description_content_type="text/markdown",
     license="MIT",
     python_requires='>=3.8',
     classifiers=[
