@@ -61,7 +61,7 @@ class AuthenticatorTest(
         self.auth.perform([self.achall])
 
         self.mock_client.add_txt_record.assert_called_with(
-            "_acme-challenge." + DOMAIN + ".", mock.ANY
+            "_acme-challenge." + DOMAIN, mock.ANY
         )
 
     @patch_display_util()
@@ -75,7 +75,7 @@ class AuthenticatorTest(
         self.auth.cleanup([self.achall])
 
         self.mock_client.del_txt_record.assert_called_with(
-            "_acme-challenge." + DOMAIN + ".", mock.ANY
+            "_acme-challenge." + DOMAIN, mock.ANY
         )
 
 
